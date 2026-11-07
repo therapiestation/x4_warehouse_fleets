@@ -1,5 +1,9 @@
 # X4 Foundations - Warehouse Fleets Mod
 
+> **Disclaimer – this is a fork.** Warehouse Fleets was created by Manuel Bleichner (mbleichner). All changes made in this repository since the fork (commits after `a96167e` "Allow trading with supply ships") were developed with the help of Claude, Anthropic's AI assistant, and are not part of the original mod. Releases, support and the canonical version remain with the original author.
+>
+> If the original author requests it, this repository will be removed.
+
 This mod was inspired by the popular [Mules and Warehouses Mod](https://github.com/Misunderstood-Wookiee/Mules-and-Warehouses-Extended) and aims to combine the different mule types into one.
 
 It introduces the WarehouseFleet behaviour, which serves the following purposes:
