@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<content id="WarehouseFleets" name="Warehouse Fleets" description="Warehouse Fleets" author="mbleichner" version="118" date="2026-11-07" save="0">
+<content id="WarehouseFleets" name="Warehouse Fleets" description="Fork of Warehouse Fleets by mbleichner, maintained by Therapiestation (github.com/therapiestation/x4_warehouse_fleets). Adds own-factory supply by ware role, selling surplus to NPCs, rebalanced NPC trading and bug fixes. Not the original mod." author="mbleichner" version="118" date="2026-11-07" save="0">
   <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs" />
   <dependency id="kuerteeUIExtensionsAndHUD" optional="false" name="kuertee UI Extensions and HUD" />
 </content>
