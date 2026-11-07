@@ -71,7 +71,7 @@
         <signal_cue_instantly cue="AddCenteredTextRow" param="table[$text='Default Fleet Settings (applied when creating new WarehouseFleets)']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'minCargoUsage', $min = 0, $max = 90, $suffix = '%', $default = 50, $text = 'Min. Cargo Usage (%)', $mouseOverText = 'Avoids scheduling inefficient trips. No ship will be scheduled that uses less than the specified cargo space. Setting this value too low can cause performance degradation. Setting the value too high might prevent/delay balancing of low volume wares. Ships supplying build storages may ignore this setting to avoid build jobs getting stuck with only a few materials left.' ]" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'minCargoUsage', $min = 0, $max = 90, $suffix = '%', $default = 50, $text = 'Min. Cargo Usage (%)', $mouseOverText = 'Avoids scheduling inefficient trips. No ship will be scheduled that uses less than the specified cargo space. Setting this value too low can cause performance degradation. Setting the value too high might prevent/delay balancing of low volume wares. Ships supplying build storages or restocking drone/ammo resources may ignore this setting if they fully satisfy the request. Smaller transports may still be added to a trip to the same station that meets the threshold.' ]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'minCargoUsage']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
@@ -83,8 +83,12 @@
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'miningGatePenalty']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioDistribution', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Distribute', $mouseOverText = 'Priority of ware distribution jobs']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioDistribution', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Distribute', $mouseOverText = 'Priority of balancing wares between warehouses']" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioDistribution']" />
+        <signal_cue_instantly cue="AddEmptyRow" />
+
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioStations', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Own Stations', $mouseOverText = 'Priority of jobs serving your own non-warehouse stations: supplying production resources, collecting products and restocking drone/ammo resources']" />
+        <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioStations']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
         <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioTrade', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Trade', $mouseOverText = 'Priority of jobs involving trade with other factions']" />

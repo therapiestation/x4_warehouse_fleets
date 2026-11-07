@@ -12,7 +12,7 @@
     </cue>
 
     <!-- Cue managing the global config variables of the mod (this cue should never be reset) -->
-    <cue name="Config" version="9">
+    <cue name="Config" version="10">
       <conditions>
         <check_any>
           <event_cue_signalled cue="md.Setup.GameStart" />
@@ -33,6 +33,7 @@
         <set_value name="global.$WarehouseFleets.$tradeGatePenalty" exact="20" />
         <set_value name="global.$WarehouseFleets.$miningGatePenalty" exact="40" />
         <set_value name="global.$WarehouseFleets.$prioDistribution" exact="5" />
+        <set_value name="global.$WarehouseFleets.$prioStations" exact="5" />
         <set_value name="global.$WarehouseFleets.$prioSupply" exact="5" />
         <set_value name="global.$WarehouseFleets.$prioBuild" exact="7" />
         <set_value name="global.$WarehouseFleets.$prioTrade" exact="5" />
@@ -98,6 +99,12 @@
         </do_if>
         <do_if value="@global.$WarehouseFleets.$miningGatePenalty == null">
           <set_value name="global.$WarehouseFleets.$miningGatePenalty" exact="40" />
+        </do_if>
+      </patch>
+
+      <patch sinceversion="10">
+        <do_if value="@global.$WarehouseFleets.$prioStations == null">
+          <set_value name="global.$WarehouseFleets.$prioStations" exact="5" />
         </do_if>
       </patch>
     </cue>
@@ -789,6 +796,7 @@
       <actions>
 
         <debug_to_file chance="100" name="$ship.idcode" directory="'WarehouseFleets'" text="'  Tradewares: ' + $tradewares" />
+        <set_value name="$prioStations" exact="if @$order.$prioStations != null then $order.$prioStations else 5" comment="fallback for orders created before this param existed" />
         <get_ware_definition result="$allwares" flags="tradeware" />
 
         <create_list name="$providerOffers" />
@@ -868,11 +876,28 @@
                 <continue comment="Schiff kann diese Ware nicht transportieren" />
               </do_if>
 
+              <!-- Transports between own stations are split by the role the ware has at the non-warehouse end (all use Prio: Own Stations):
+                   - restock:  receiver needs the ware only to build its own drones/ammo (vanilla "supplies" buy offer). Detected via supplyresources,
+                               or as a buy offer for a ware that is neither resource, product nor trade ware there (that can only be a supplies offer).
+                               These wares have no meaningful storage target at the receiver, so ratio balancing would never deliver them.
+                   - consumer: receiver uses the ware as production resource (and doesn't produce it) => fill it to its own target.
+                   - producer: provider produces the ware (and doesn't consume it) => collect it as long as the receiver has room.
+                   Consumer/producer must not be balanced by fill ratio: for low-volume wares warehouses get huge storage targets
+                   (e.g. 250k+ units) and therefore always have a very low fill ratio, which starved consumers.
+                   Everything else between own stations (typically warehouse <-> warehouse) stays 'distribution' (ratio balancing). -->
+              <set_value name="$ware" exact="$receiverOffer.ware" />
+              <set_value name="$ownStations" exact="$provider.trueowner == faction.player and $receiver.trueowner == faction.player" />
               <set_value name="$transportType" exact="
                 if $order.$supplyTargets.indexof.{$receiver} > 0 then 'supply'
                 else if $receiver.trueowner == faction.player and $receiver.class == class.buildstorage then 'build'
-                else if $provider.trueowner == faction.player and $receiver.trueowner == faction.player then 'distribution'
-                else 'trade'
+                else if not $ownStations then 'trade'
+                else if @$receiver.supplyresources.indexof.{$ware} gt 0
+                    and @$receiver.resources.indexof.{$ware} == 0 and @$receiver.products.indexof.{$ware} == 0 then 'restock'
+                else if @$receiver.resources.indexof.{$ware} == 0 and @$receiver.products.indexof.{$ware} == 0
+                    and @$receiver.tradewares.indexof.{$ware} == 0 then 'restock'
+                else if @$receiver.resources.indexof.{$ware} gt 0 and @$receiver.products.indexof.{$ware} == 0 then 'consumer'
+                else if @$provider.products.indexof.{$ware} gt 0 and @$provider.resources.indexof.{$ware} == 0 then 'producer'
+                else 'distribution'
               " />
 
               <!-- Unprofitable Trades kann man hier schon erkennen und abbrechen -->
@@ -919,14 +944,22 @@
                 else 100.0" />
 
               <!-- Berechnung der Waren-Menge ($amount) -->
-              <do_if value="$transportType == 'distribution'">
+              <!-- Remaining demand of the receiver's buy offer, minus what's already on the way -->
+              <set_value name="$receiverDemand" exact="[$receiverOffer.desiredamount - [$receiverReservations, 0].max, 0].max" />
+
+              <do_if value="$transportType == 'restock' or $transportType == 'consumer' or $transportType == 'producer'">
+                <!-- Restock/Consumer/Producer: move what the receiver still wants, as far as the provider can deliver it -->
+                <set_value name="$equalizingAmount" exact="null" />
+                <set_value name="$amount" exact="[[$maxWareAmount, $providerOffer.amount, $receiverDemand].min, 0].max" />
+              </do_if>
+              <do_elseif value="$transportType == 'distribution'">
                 <!-- Bei Distribution Transports die maximale sinnvolle Menge berechnen (es soll maximal soviel transportiert werden, dass die Mengen danach ausgeglichen sind) -->
                 <set_value name="$equalizingAmount" exact="(
                   ($providerCargo + $providerReservations) * (($receiverCapacity)LF / ($providerCapacity + $receiverCapacity))
                 - ($receiverCargo + $receiverReservations) * (($providerCapacity)LF / ($providerCapacity + $receiverCapacity))
                 )i" />
                 <set_value name="$amount" exact="[[$maxWareAmount, $equalizingAmount].min, 0].max" />
-              </do_if>
+              </do_elseif>
               <do_if value="$transportType == 'supply' or $transportType == 'build'">
                 <!-- Bei supply/build die maximal mögliche Menge transportieren (unabhängig davon, ob diese "bezahlt" werden kann) -->
                 <set_value name="$amount" exact="[[$maxWareAmount, $providerOffer.amount, $receiverOffer.desiredamount].min, 0].max" />
@@ -948,6 +981,16 @@
               <do_if value="$transportType == 'distribution'">
                 <set_value name="$importance" exact="($providerCargoRatio - $receiverCargoRatio) * (1.0 - $receiverCargoRatio/200.0) * ($order.$prioDistribution/10f)" />
               </do_if>
+              <!-- Own stations: same scale as balancing, but only the non-warehouse end's fill level matters -->
+              <do_if value="$transportType == 'consumer'">
+                <set_value name="$importance" exact="(100.0 - $receiverCargoRatio) * (1.0 - $receiverCargoRatio/200.0) * ($prioStations/10f)" comment="provider counts as full" />
+              </do_if>
+              <do_if value="$transportType == 'producer'">
+                <set_value name="$importance" exact="$providerCargoRatio * (1.0 - $receiverCargoRatio/200.0) * ($prioStations/10f)" comment="receiver counts as empty" />
+              </do_if>
+              <do_if value="$transportType == 'restock'">
+                <set_value name="$importance" exact="100.0 * ($prioStations/10f)" comment="no meaningful storage target for supply wares - treat like an empty consumer" />
+              </do_if>
               <do_if value="$transportType == 'supply'">
                 <set_value name="$importance" exact="0.5 * (1.0 - $receiverCargoRatio/200.0) * $order.$prioSupply^2" />
               </do_if>
@@ -960,8 +1003,14 @@
                 <set_value name="$importance" exact="0.5 * ([100f * $profitRatio, 0].max + $storageLevelRating/100.0) * ((100f-$order.$tradeGatePenalty)/100f) ^ $gd * ($order.$prioTrade/10f)" />
               </do_if>
 
+              <!-- Transports that fully satisfy a build or restock request may ignore minCargoUsage, otherwise small/low-volume requests would never be served -->
               <set_value name="$completesBuildRequest" exact="$transportType == 'build' and $receiverOffer.desiredamount == $amount" />
-              <set_value name="$rating" exact="$importance * if ($completesBuildRequest) then ($shipCapacity) else ($amount * $providerOffer.ware.volume)" />
+              <set_value name="$completesRestockRequest" exact="$transportType == 'restock' and $amount gt 0 and $amount == $receiverDemand" />
+              <set_value name="$completesRequest" exact="$completesBuildRequest or $completesRestockRequest" />
+              <set_value name="$rating" exact="$importance *
+                if $completesBuildRequest then ($shipCapacity)
+                else if $completesRestockRequest then [$amount * $providerOffer.ware.volume, $order.$minCargoUsage / 100.0 * $shipCapacity].max
+                else ($amount * $providerOffer.ware.volume)" comment="restock: rate like a trip that just meets minCargoUsage, so it isn't starved in busy fleets" />
 
               <debug_to_file chance="100" name="$ship.idcode" directory="'WarehouseFleets'"
                 text="'  '
@@ -982,7 +1031,8 @@
                   + ', amount = ' + $amount
                   + ', gd = ' + @$gd
                   + ', cargoUsage = ' + '%.1s'.[100.0 * $cargoUsage] + '%'
-                  + ', completesBuildRequest = ' + $completesBuildRequest
+                  + ', receiverDemand = ' + $receiverDemand
+                  + ', completesRequest = ' + $completesRequest
                 "
               />
 
@@ -990,9 +1040,8 @@
                 <continue comment="Ware ignorieren, falls der Transport nicht sinnvoll ist" />
               </do_if>
 
-              <do_if value="($amount * $providerOffer.ware.volume) lt ($order.$minCargoUsage / 100.0 * $shipCapacity) and (not $completesBuildRequest)">
-                <continue comment="performance optimization to reduce the amount of trades that need to be considered later" />
-              </do_if>
+              <!-- Transports below minCargoUsage are kept for now - they may still be combined with other wares for the same relation (see below) -->
+              <set_value name="$belowMinCargo" exact="($amount * $providerOffer.ware.volume) lt ($order.$minCargoUsage / 100.0 * $shipCapacity) and (not $completesRequest)" />
 
               <append_to_list name="$possibleTransports" exact="table[
                 $transportType = $transportType,
@@ -1009,11 +1058,27 @@
                 $receiverID = $receiver.idcode,
                 $providerOffer = $providerOffer, 
                 $receiverOffer = $receiverOffer,
-                $completesBuildRequest = $completesBuildRequest,
+                $completesRequest = $completesRequest,
+                $belowMinCargo = $belowMinCargo,
               ]" />
             </do_if>
           </do_for_each>
         </do_for_each>
+
+        <!-- Small transports (e.g. low-volume wares like metallic microlattice) are only kept if they can piggyback on a relation
+             that has at least one transport that is worth a trip on its own. Others are dropped to keep AssembleTrip cheap. -->
+        <set_value name="$viableRelations" exact="table[]" />
+        <do_for_each in="$possibleTransports" name="$transport">
+          <do_if value="not $transport.$belowMinCargo">
+            <set_value name="$viableRelations.{'$' + $transport.$providerID + ':' + $transport.$receiverID}" exact="true" />
+          </do_if>
+        </do_for_each>
+        <do_all exact="$possibleTransports.count" counter="$idx" reverse="true">
+          <set_value name="$transport" exact="$possibleTransports.{$idx}" />
+          <do_if value="$transport.$belowMinCargo and not @$viableRelations.{'$' + $transport.$providerID + ':' + $transport.$receiverID}">
+            <remove_value name="$possibleTransports.{$idx}" comment="remove by index since remove by value seems to be unreliable" />
+          </do_if>
+        </do_all>
 
         <sort_list list="$possibleTransports" sortbyvalue="loop.element.$rating" sortdescending="true" />
         <debug_to_file chance="100" name="$ship.idcode" directory="'WarehouseFleets'" text="'  ' + $possibleTransports.count + ' possible transports found'" />
@@ -1054,32 +1119,44 @@
           <set_value name="$usedCargoSpace" exact="0" />
           <set_value name="$rating" exact="0" />
           <set_value name="$transportWares" exact="[]" />
-          <set_value name="$completesBuildRequest" exact="false" />
-          <do_for_each in="$possibleTransports" name="$transport">
-            <do_if value="$transport.$provider == $referenceTransport.$provider and $transport.$receiver == $referenceTransport.$receiver">
-              <set_value name="$maxTransportAmount" exact="[$transport.$amount, ($ship.cargo.capacity.all - $usedCargoSpace) / $transport.$ware.volume].min" />
-              <append_to_list name="$transportWares" exact="table[
-                $ware = $transport.$ware,
-                $amount = $maxTransportAmount,
-                $providerOffer = $transport.$providerOffer, 
-                $receiverOffer = $transport.$receiverOffer,
-              ]" />
-              <set_value name="$rating" operation="add" exact="$transport.$rating" />
-              <set_value name="$usedCargoSpace" operation="add" exact="$maxTransportAmount * $transport.$ware.volume" />
-              <set_value name="$completesBuildRequest" exact="$completesBuildRequest or $transport.$completesBuildRequest" />
-              <do_if value="$transportWares.count ge 3">
-                <break comment="Nicht mehr als 3 verschiedene Waren transportieren" />
-              </do_if>
-              <set_value name="$cargoUsage" exact="100f * $usedCargoSpace / $ship.cargo.capacity.all" />
-              <do_if value="$cargoUsage gt 95f">
-                <break comment="Abbrechen, wenn das Schiff voll beladen ist" />
-              </do_if>
+          <set_value name="$completesRequest" exact="false" />
+          <set_value name="$tripFull" exact="false" />
+          <!-- Pass 1: transports that are worth a trip on their own; pass 2: small transports that can only piggyback -->
+          <do_all exact="2" counter="$pass">
+            <do_if value="$tripFull">
+              <break />
             </do_if>
-          </do_for_each>
+            <do_for_each in="$possibleTransports" name="$transport">
+              <do_if value="($pass == 1) == (@$transport.$belowMinCargo == true)">
+                <continue />
+              </do_if>
+              <do_if value="$transport.$provider == $referenceTransport.$provider and $transport.$receiver == $referenceTransport.$receiver">
+                <set_value name="$maxTransportAmount" exact="[$transport.$amount, ($ship.cargo.capacity.all - $usedCargoSpace) / $transport.$ware.volume].min" />
+                <append_to_list name="$transportWares" exact="table[
+                  $ware = $transport.$ware,
+                  $amount = $maxTransportAmount,
+                  $providerOffer = $transport.$providerOffer,
+                  $receiverOffer = $transport.$receiverOffer,
+                ]" />
+                <set_value name="$rating" operation="add" exact="$transport.$rating" />
+                <set_value name="$usedCargoSpace" operation="add" exact="$maxTransportAmount * $transport.$ware.volume" />
+                <set_value name="$completesRequest" exact="$completesRequest or $transport.$completesRequest" />
+                <do_if value="$transportWares.count ge 3">
+                  <set_value name="$tripFull" exact="true" />
+                  <break comment="Nicht mehr als 3 verschiedene Waren transportieren" />
+                </do_if>
+                <set_value name="$cargoUsage" exact="100f * $usedCargoSpace / $ship.cargo.capacity.all" />
+                <do_if value="$cargoUsage gt 95f">
+                  <set_value name="$tripFull" exact="true" />
+                  <break comment="Abbrechen, wenn das Schiff voll beladen ist" />
+                </do_if>
+              </do_if>
+            </do_for_each>
+          </do_all>
 
           <!-- Falls die minCargoUsage erreicht wurde => als Ergebnis zurückgeben. Ansonsten wird die nächste Relation geprüft -->
           <set_value name="$cargoUsage" exact="100f * $usedCargoSpace / $ship.cargo.capacity.all" />
-          <do_if value="$cargoUsage ge $order.$minCargoUsage or $completesBuildRequest">
+          <do_if value="$cargoUsage ge $order.$minCargoUsage or $completesRequest">
             <return value="table[
               $provider = $referenceTransport.$provider,
               $receiver = $referenceTransport.$receiver,
