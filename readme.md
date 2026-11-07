@@ -45,11 +45,13 @@ To make this work, every warehouse gets assigned a "WarehouseFleet", composed of
 | Prio: Distribute | Set to high values to generally favor balancing wares between warehouses over other tasks. |
 | Prio: Own Stations | Set to high values to generally favor serving your own (non-warehouse) stations over other tasks: supplying production resources, collecting products and restocking resources for the station's own drones/ammunition. |
 | Prio: Trade  | Set to high values to generally favor trading over other tasks. |
+| Prio: Sell-Out | Set to high values to generally favor selling surplus wares (see "Sell-Out: Keep") over other tasks. 0 disables sell-out. |
 | Prio: Supply | Set to high values to generally favor supply targets (e.g. shipyards) over other tasks. |
 | Prio: Build | Set to high values to generally favor filling build storages over other tasks. |
 | Prio: Mining | Set to high values to generally favor mining trips over other tasks. Only applicable for mining ships (solid or liquid cargo). |
 | Min. Cargo Usage (%) | Avoids scheduling inefficient trips. No ship will be scheduled that uses less than the specified cargo space. Setting this value too low can cause performance degradation. Setting the value too high might prevent/delay balancing of low volume wares. Ships supplying build storages or restocking a station's drone/ammunition resources may ignore this setting if they fully satisfy the request. Smaller transports can still be added to a trip to the same station that already meets this threshold. |
-| Trade Gate Penalty (%) | Reduces the attractivity of trades in other sectors to keep travel distances short. |
+| Sell-Out: Keep (%) | Share of each ware's storage target the home warehouse keeps. Everything above it may be sold to NPC stations within the fleet's targets, **ignoring the ware's trade rules** (e.g. player-only wares). Sales never go below the warehouse's own sell price; better-paying buyers are preferred. 100% (default) disables sell-out. |
+| Trade Gate Penalty (%) | Reduces the attractivity of trades (including sell-out) in other sectors to keep travel distances short. |
 | Mining Gate Penalty (%) | Reduces the attractivity of mining in other sectors to keep travel distances short. |
 
 ## Global Settings

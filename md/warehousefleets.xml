@@ -12,7 +12,7 @@
     </cue>
 
     <!-- Cue managing the global config variables of the mod (this cue should never be reset) -->
-    <cue name="Config" version="10">
+    <cue name="Config" version="11">
       <conditions>
         <check_any>
           <event_cue_signalled cue="md.Setup.GameStart" />
@@ -38,6 +38,8 @@
         <set_value name="global.$WarehouseFleets.$prioBuild" exact="7" />
         <set_value name="global.$WarehouseFleets.$prioTrade" exact="5" />
         <set_value name="global.$WarehouseFleets.$prioMining" exact="4" />
+        <set_value name="global.$WarehouseFleets.$prioSellOut" exact="5" />
+        <set_value name="global.$WarehouseFleets.$sellOutKeep" exact="100" comment="100 = keep everything = sell-out disabled" />
         <set_value name="global.$WarehouseFleets.$fleetOrganization" exact="1" comment="1 = independent fleets, 2 = subordinates of warehouse" />
       </actions>
 
@@ -105,6 +107,15 @@
       <patch sinceversion="10">
         <do_if value="@global.$WarehouseFleets.$prioStations == null">
           <set_value name="global.$WarehouseFleets.$prioStations" exact="5" />
+        </do_if>
+      </patch>
+
+      <patch sinceversion="11">
+        <do_if value="@global.$WarehouseFleets.$prioSellOut == null">
+          <set_value name="global.$WarehouseFleets.$prioSellOut" exact="5" />
+        </do_if>
+        <do_if value="@global.$WarehouseFleets.$sellOutKeep == null">
+          <set_value name="global.$WarehouseFleets.$sellOutKeep" exact="100" />
         </do_if>
       </patch>
     </cue>
@@ -394,6 +405,18 @@
                 <run_actions ref="GetTradewaresFromOffers" result="$pushWares">
                   <param name="tradeoffers" value="$sellOffers" />
                 </run_actions>
+
+                <!-- Sell-Out: Waren oberhalb des Behalte-Anteils auch dann aufnehmen, wenn die Handelsregel sie nur intern erlaubt,
+                     damit für sie NPC-Kaufangebote gesucht werden (Mengen-/Preisprüfung erfolgt pro Ware in FindPossibleTransports) -->
+                <do_if value="@$order.$sellOutKeep != null and $order.$sellOutKeep lt 100 and @$order.$prioSellOut gt 0">
+                  <do_for_each in="$sellOffers" name="$offer">
+                    <set_value name="$wareTarget" exact="$sourceStation.cargo.{$offer.ware}.target" />
+                    <do_if value="$wareTarget gt 0 and $pushWares.indexof.{$offer.ware} == 0
+                        and $sourceStation.cargo.{$offer.ware}.count gt $wareTarget * $order.$sellOutKeep / 100">
+                      <append_to_list name="$pushWares" exact="$offer.ware" />
+                    </do_if>
+                  </do_for_each>
+                </do_if>
 
                 <!-- Warenliste für Pull-Trades erstellen -->
                 <find_buy_offer buyer="$sourceStation" result="$buyOffers" tradepartner="$ship" multiple="true" usereservations="false" excludeempty="true" />
@@ -797,6 +820,9 @@
 
         <debug_to_file chance="100" name="$ship.idcode" directory="'WarehouseFleets'" text="'  Tradewares: ' + $tradewares" />
         <set_value name="$prioStations" exact="if @$order.$prioStations != null then $order.$prioStations else 5" comment="fallback for orders created before this param existed" />
+        <set_value name="$prioSellOut" exact="if @$order.$prioSellOut != null then $order.$prioSellOut else 5" comment="fallback for orders created before this param existed" />
+        <set_value name="$sellOutKeep" exact="if @$order.$sellOutKeep != null then $order.$sellOutKeep else 100" comment="100 = disabled" />
+        <set_value name="$sellOutEnabled" exact="$sellOutKeep lt 100 and $prioSellOut gt 0" />
         <get_ware_definition result="$allwares" flags="tradeware" />
 
         <create_list name="$providerOffers" />
@@ -900,10 +926,30 @@
                 else 'distribution'
               " />
 
+              <!-- Sell-Out: Verkauf vom Home-Warehouse an NPCs, soweit die Ware über dem Behalte-Anteil ($sellOutKeep % des Lagerziels) liegt.
+                   Ignoriert die Fraktions-Restriktionen des eigenen Verkaufsangebots (z.B. "nur intern") und ist auf den Überschuss begrenzt.
+                   Ohne Überschuss bleibt es ein normaler Trade (inkl. Restriktionsprüfung). -->
+              <set_value name="$sellOutSurplus" exact="0" />
+              <do_if value="$transportType == 'trade' and $sellOutEnabled and $provider.idcode == $order.$sourceStation.idcode">
+                <set_value name="$sellOutTarget" exact="$provider.cargo.{$ware}.target" />
+                <do_if value="$sellOutTarget gt 0">
+                  <set_value name="$sellOutKeepAmount" exact="$sellOutTarget * $sellOutKeep / 100" />
+                  <set_value name="$sellOutSurplus" exact="$provider.cargo.{$ware}.count
+                    - (@$reservations.{'$' + $ware.id + ':' + $provider.idcode + ':outgoing'} + 0)
+                    - $sellOutKeepAmount" comment="only count outgoing reservations, incoming wares are not there yet" />
+                  <do_if value="$sellOutSurplus gt 0">
+                    <set_value name="$transportType" exact="'sellout'" />
+                  </do_if>
+                </do_if>
+              </do_if>
+
               <!-- Unprofitable Trades kann man hier schon erkennen und abbrechen -->
               <set_value name="$profitRatio" exact="($receiverOffer.unitprice)f / ($providerOffer.unitprice)f - 1f" comment="Wertebereich ca. (-1, +1)" />
               <do_if value="$transportType == 'trade' and $profitRatio le 0.05">
                 <continue />
+              </do_if>
+              <do_if value="$transportType == 'sellout' and $profitRatio lt 0">
+                <continue comment="Sell-Out never sells below the warehouse's own sell price" />
               </do_if>
 
               <!-- Bei Trade Transports prüfen, ob das eigene Buy/Sell Offer Restriktionen hat und diese berücksichtigen -->
@@ -975,6 +1021,10 @@
                   <set_value name="$amount" exact="[[$maxWareAmount, $providerOffer.amount, $receiverOffer.amount].min, 0].max" />
                 </do_else>
               </do_if>
+              <do_if value="$transportType == 'sellout'">
+                <!-- Sell-Out: höchstens den Überschuss über dem Behalte-Anteil verkaufen -->
+                <set_value name="$amount" exact="[[$maxWareAmount, $providerOffer.amount, $receiverOffer.amount, $sellOutSurplus].min, 0].max" />
+              </do_if>
 
               <set_value name="$cargoUsage" exact="($amount)f / $maxWareAmount" />
 
@@ -1001,6 +1051,13 @@
                 <set_value name="$storageLevelRating" exact="[[if $provider.idcode == $order.$sourceStation.idcode then $providerCargoRatio else (100f - $receiverCargoRatio), 100.0].min, 0.0].max" />
                 <set_value name="$gd" exact="$provider.gatedistance.{$receiver}.{blacklistgroup.civilian}.{$ship}" />
                 <set_value name="$importance" exact="0.5 * ([100f * $profitRatio, 0].max + $storageLevelRating/100.0) * ((100f-$order.$tradeGatePenalty)/100f) ^ $gd * ($order.$prioTrade/10f)" />
+              </do_if>
+              <do_if value="$transportType == 'sellout'">
+                <!-- Same scale as distribution: 0 at the keep level, 100 when the warehouse is at (or above) its storage target.
+                     Better prices are preferred (up to 2x), more distant buyers are penalized like normal trades. -->
+                <set_value name="$sellOutRatio" exact="[[100.0 * $sellOutSurplus / [$sellOutTarget - $sellOutKeepAmount, 1].max, 100.0].min, 0.0].max" />
+                <set_value name="$gd" exact="$provider.gatedistance.{$receiver}.{blacklistgroup.civilian}.{$ship}" />
+                <set_value name="$importance" exact="$sellOutRatio * (1.0 + [$profitRatio, 1.0].min) * ((100f-$order.$tradeGatePenalty)/100f) ^ $gd * ($prioSellOut/10f)" />
               </do_if>
 
               <!-- Transports that fully satisfy a build or restock request may ignore minCargoUsage, otherwise small/low-volume requests would never be served -->
@@ -1032,6 +1089,7 @@
                   + ', gd = ' + @$gd
                   + ', cargoUsage = ' + '%.1s'.[100.0 * $cargoUsage] + '%'
                   + ', receiverDemand = ' + $receiverDemand
+                  + ', sellOutSurplus = ' + $sellOutSurplus
                   + ', completesRequest = ' + $completesRequest
                 "
               />

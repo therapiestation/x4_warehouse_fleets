@@ -95,6 +95,14 @@
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioTrade']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioSellOut', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Sell-Out', $mouseOverText = 'Priority of selling surplus wares from the home warehouse to NPC stations (see Sell-Out: Keep). 0 disables sell-out.']" />
+        <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioSellOut']" />
+        <signal_cue_instantly cue="AddEmptyRow" />
+
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'sellOutKeep', $min = 0, $max = 100, $suffix = '%', $default = 100, $text = 'Sell-Out: Keep (%)', $mouseOverText = 'Share of the storage target of each ware that the home warehouse keeps. Everything above it may be sold to NPC stations in the fleet targets, even if the ware trade rule forbids NPC trade (e.g. player-only). Never sells below the warehouse sell price. 100% disables sell-out.']" />
+        <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'sellOutKeep']" />
+        <signal_cue_instantly cue="AddEmptyRow" />
+
         <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioSupply', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Supply', $mouseOverText = 'Priority of jobs related to supply targets']" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioSupply']" />
         <signal_cue_instantly cue="AddEmptyRow" />
