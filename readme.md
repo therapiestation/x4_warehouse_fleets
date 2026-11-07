@@ -4,6 +4,18 @@
 >
 > If the original author requests it, this repository will be removed.
 
+## Changes since the fork
+
+**Features**
+- **Own factories are served by ware role.** Transports between your own stations used to be balanced by fill ratio only. Now they depend on what the ware is for at the factory: production resources are delivered up to the factory's target, products are collected, and drone/ammo supplies are restocked as requested. Before, consumers of low-volume wares (e.g. metallic microlattice) and the drone/ammo restocking of defence stations were starved, because warehouses with huge storage targets always looked empty. New slider: *Prio: Own Factories*.
+- **Small transports piggyback.** Loads below *Min. Load* can ride along on a trip that already goes to the same station. Deliveries that completely fill a build-storage or drone/ammo request may ignore *Min. Load*.
+- **Selling surplus to NPCs.** Home-warehouse stock above *Sell Surplus: Keep (%)* of its storage target can be sold to NPC stations in the fleet's targets, even if the ware's trade rule is player-only. It never sells below the warehouse's own sell price. New sliders: *Prio: NPC Sell Surplus*, *Sell Surplus: Keep (%)* (100% = off).
+- **NPC trades compete properly.** Trade priority is now on the same scale as the other jobs. Higher margins (up to 25%) are preferred, as are buys into an empty and sales from a full warehouse. Before, a trade almost never beat any other job, whatever *Prio: NPC Trade* was set to.
+- **Clearer settings.** Sliders were renamed (e.g. *Prio: Distribute* → *Prio: Balance Warehouses*, *Prio: Trade* → *Prio: NPC Trade (Profit)*, *Min. Cargo Usage* → *Min. Load (% of hold)*) and got more precise tooltips. Existing fleet settings are kept.
+
+**Bug fixes**
+- **Warehouse ping-pong.** The own-factory change above misclassified every transport between your own stations (including warehouse ↔ warehouse) as a restock request. Ships then carried full loads of the same ware back and forth between two warehouses, and *Prio: Balance Warehouses* had no effect. Warehouses are balanced by fill level again.
+
 This mod was inspired by the popular [Mules and Warehouses Mod](https://github.com/Misunderstood-Wookiee/Mules-and-Warehouses-Extended) and aims to combine the different mule types into one.
 
 It introduces the WarehouseFleet behaviour, which serves the following purposes:
