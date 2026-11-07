@@ -902,7 +902,7 @@
                 <continue comment="Schiff kann diese Ware nicht transportieren" />
               </do_if>
 
-              <!-- Transports between own stations are split by the role the ware has at the non-warehouse end (all use Prio: Own Stations):
+              <!-- Transports between own stations are split by the role the ware has at the non-warehouse end (all use Prio: Own Factories):
                    - restock:  receiver needs the ware only to build its own drones/ammo (vanilla "supplies" buy offer). Detected via supplyresources,
                                or as a buy offer for a ware that is neither resource, product nor trade ware there (that can only be a supplies offer).
                                These wares have no meaningful storage target at the receiver, so ratio balancing would never deliver them.
@@ -910,19 +910,25 @@
                    - producer: provider produces the ware (and doesn't consume it) => collect it as long as the receiver has room.
                    Consumer/producer must not be balanced by fill ratio: for low-volume wares warehouses get huge storage targets
                    (e.g. 250k+ units) and therefore always have a very low fill ratio, which starved consumers.
-                   Everything else between own stations (typically warehouse <-> warehouse) stays 'distribution' (ratio balancing). -->
+                   Everything else between own stations (typically warehouse <-> warehouse) stays 'distribution' (ratio balancing).
+                   Note: resources/products/tradewares/supplyresources are warelists - they only support .{$ware}.exists/.list/.count,
+                   NOT .indexof (with @ that silently yields null == 0, which turned every own-station transport into 'restock'). -->
               <set_value name="$ware" exact="$receiverOffer.ware" />
               <set_value name="$ownStations" exact="$provider.trueowner == faction.player and $receiver.trueowner == faction.player" />
+              <set_value name="$receiverUses" exact="@$receiver.resources.{$ware}.exists == true" />
+              <set_value name="$receiverMakes" exact="@$receiver.products.{$ware}.exists == true" />
+              <set_value name="$receiverTrades" exact="@$receiver.tradewares.{$ware}.exists == true" />
+              <set_value name="$receiverSupplies" exact="@$receiver.supplyresources.{$ware}.exists == true" />
+              <set_value name="$providerUses" exact="@$provider.resources.{$ware}.exists == true" />
+              <set_value name="$providerMakes" exact="@$provider.products.{$ware}.exists == true" />
               <set_value name="$transportType" exact="
                 if $order.$supplyTargets.indexof.{$receiver} > 0 then 'supply'
                 else if $receiver.trueowner == faction.player and $receiver.class == class.buildstorage then 'build'
                 else if not $ownStations then 'trade'
-                else if @$receiver.supplyresources.indexof.{$ware} gt 0
-                    and @$receiver.resources.indexof.{$ware} == 0 and @$receiver.products.indexof.{$ware} == 0 then 'restock'
-                else if @$receiver.resources.indexof.{$ware} == 0 and @$receiver.products.indexof.{$ware} == 0
-                    and @$receiver.tradewares.indexof.{$ware} == 0 then 'restock'
-                else if @$receiver.resources.indexof.{$ware} gt 0 and @$receiver.products.indexof.{$ware} == 0 then 'consumer'
-                else if @$provider.products.indexof.{$ware} gt 0 and @$provider.resources.indexof.{$ware} == 0 then 'producer'
+                else if $receiverSupplies and not $receiverUses and not $receiverMakes then 'restock'
+                else if not $receiverUses and not $receiverMakes and not $receiverTrades then 'restock'
+                else if $receiverUses and not $receiverMakes then 'consumer'
+                else if $providerMakes and not $providerUses then 'producer'
                 else 'distribution'
               " />
 
@@ -1050,7 +1056,11 @@
               <do_if value="$transportType == 'trade'">
                 <set_value name="$storageLevelRating" exact="[[if $provider.idcode == $order.$sourceStation.idcode then $providerCargoRatio else (100f - $receiverCargoRatio), 100.0].min, 0.0].max" />
                 <set_value name="$gd" exact="$provider.gatedistance.{$receiver}.{blacklistgroup.civilian}.{$ship}" />
-                <set_value name="$importance" exact="0.5 * ([100f * $profitRatio, 0].max + $storageLevelRating/100.0) * ((100f-$order.$tradeGatePenalty)/100f) ^ $gd * ($order.$prioTrade/10f)" />
+                <!-- Same 0..100 scale as the other types: margin saturates at 25% (=100), weighted 50..100% by the warehouse's storage level
+                     (selling from a full / buying into an empty warehouse is preferred). Old formula topped out at ~2-8 for realistic margins,
+                     so trades practically never won against own-station transports. -->
+                <set_value name="$profitScore" exact="[[400f * $profitRatio, 0.0].max, 100.0].min" />
+                <set_value name="$importance" exact="$profitScore * (0.5 + $storageLevelRating/200.0) * ((100f-$order.$tradeGatePenalty)/100f) ^ $gd * ($order.$prioTrade/10f)" />
               </do_if>
               <do_if value="$transportType == 'sellout'">
                 <!-- Same scale as distribution: 0 at the keep level, 100 when the warehouse is at (or above) its storage target.
