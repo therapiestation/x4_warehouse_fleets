@@ -26,30 +26,30 @@
       </param>
 
       <!-- priorities and behavior -->
-      <param name="prioDistribution" default="global.$WarehouseFleets.$prioDistribution" type="number" text="Prio: Distribute">
+      <param name="prioDistribution" default="global.$WarehouseFleets.$prioDistribution" type="number" text="Prio: Balance Warehouses">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
       </param>
-      <param name="prioStations" default="global.$WarehouseFleets.$prioStations" type="number" text="Prio: Own Stations">
+      <param name="prioStations" default="global.$WarehouseFleets.$prioStations" type="number" text="Prio: Own Factories">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="47" value="global.$WarehouseFleets.$prioStations" />
       </param>
-      <param name="prioTrade" default="global.$WarehouseFleets.$prioTrade" type="number" text="Prio: Trade">
+      <param name="prioTrade" default="global.$WarehouseFleets.$prioTrade" type="number" text="Prio: NPC Trade (Profit)">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
       </param>
-      <param name="prioSellOut" default="global.$WarehouseFleets.$prioSellOut" type="number" text="Prio: Sell-Out">
+      <param name="prioSellOut" default="global.$WarehouseFleets.$prioSellOut" type="number" text="Prio: NPC Sell Surplus">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="48" value="global.$WarehouseFleets.$prioSellOut" />
       </param>
-      <param name="prioSupply" default="global.$WarehouseFleets.$prioSupply" type="number" text="Prio: Supply">
+      <param name="prioSupply" default="global.$WarehouseFleets.$prioSupply" type="number" text="Prio: Supply Targets">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="38" value="5" />
       </param>
-      <param name="prioBuild" default="global.$WarehouseFleets.$prioBuild" type="number" text="Prio: Build">
+      <param name="prioBuild" default="global.$WarehouseFleets.$prioBuild" type="number" text="Prio: Build Storages">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="42" value="7" />
@@ -60,17 +60,17 @@
         <patch sinceversion="46" value="global.$WarehouseFleets.$prioMining" />
       </param>
 
-      <param name="minCargoUsage" default="global.$WarehouseFleets.$minCargoUsage" type="number" text="Min. Cargo Usage (%)">
+      <param name="minCargoUsage" default="global.$WarehouseFleets.$minCargoUsage" type="number" text="Min. Load (% of hold)">
         <input_param name="min" value="0" />
         <input_param name="max" value="90" />
         <patch sinceversion="43" value="[$minCargoUsage, 90].min" comment="reduced max value from 100 to 90" />
       </param>
-      <param name="sellOutKeep" default="global.$WarehouseFleets.$sellOutKeep" type="number" text="Sell-Out: Keep (%)">
+      <param name="sellOutKeep" default="global.$WarehouseFleets.$sellOutKeep" type="number" text="Sell Surplus: Keep (%)">
         <input_param name="min" value="0" />
         <input_param name="max" value="100" />
         <patch sinceversion="48" value="global.$WarehouseFleets.$sellOutKeep" />
       </param>
-      <param name="tradeGatePenalty" default="global.$WarehouseFleets.$tradeGatePenalty" type="number" text="Trade Gate Penalty (%)">
+      <param name="tradeGatePenalty" default="global.$WarehouseFleets.$tradeGatePenalty" type="number" text="NPC Trade: Gate Penalty (%)">
         <input_param name="min" value="0" />
         <input_param name="max" value="90" />
       </param>
