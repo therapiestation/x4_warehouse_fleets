@@ -11,13 +11,13 @@
     next scheduling round decide the next task for the ship).
   -->
 
-  <order id="WarehouseFleetMine" name="WarehouseFleet Mining" description="One-shot mining trip for the WarehouseFleet behaviour." category="internal" allowinloop="false">
+  <order id="WarehouseFleetMine" name="{1779100, 4}" description="{1779100, 5}" category="internal" allowinloop="false">
     <params>
-      <param name="sourceStation" required="true" type="internal" text="Home Warehouse" default="null">
+      <param name="sourceStation" required="true" type="internal" text="{1779100, 101}" default="null">
         <input_param name="class" value="[class.station]" />
         <input_param name="owner" value="this.ship.trueowner" />
       </param>
-      <param name="ware" required="true" type="internal" text="Ware to mine" comment="The single ware to gather. Picked by FindMiningTrip in the MD scheduler." default="null">
+      <param name="ware" required="true" type="internal" text="{1779100, 120}" comment="The single ware to gather. Picked by FindMiningTrip in the MD scheduler." default="null">
         <input_param name="cancarry" value="this.ship" />
         <input_param name="isminable" value="true" />
       </param>

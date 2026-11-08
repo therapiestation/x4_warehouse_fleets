@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Literal parentheses must be escaped as \( \): unescaped (...) is treated as a comment and not shown. -->
+<language id="44">
+  <page id="1779100" title="Warehouse Fleets" descr="Texts of the Warehouse Fleets extension" voice="no">
+    <!-- orders -->
+    <t id="1">WarehouseFleet</t>
+    <t id="2">Warehouse Fleet</t>
+    <t id="3">Return to Warehouse</t>
+    <t id="4">WarehouseFleet Mining</t>
+    <t id="5">One-shot mining trip for the WarehouseFleet behaviour.</t>
+
+    <!-- order parameters (also used as labels in the options menu) -->
+    <t id="101">Home Warehouse</t>
+    <t id="102">Targets \(all ships\)</t>
+    <t id="103">Targets \(L only\)</t>
+    <t id="104">Targets \(M only\)</t>
+    <t id="105">Supply Targets</t>
+    <t id="106">Prio: Balance Warehouses</t>
+    <t id="107">Prio: Own Factories</t>
+    <t id="108">Prio: NPC Trade \(Profit\)</t>
+    <t id="109">Prio: NPC Sell Surplus</t>
+    <t id="110">Prio: Supply Targets</t>
+    <t id="111">Prio: Build Storages</t>
+    <t id="112">Prio: Mining</t>
+    <t id="113">Min. Load \(% of hold\)</t>
+    <t id="114">Sell Surplus: Keep \(%\)</t>
+    <t id="115">NPC Trade: Gate Penalty \(%\)</t>
+    <t id="116">Mining Gate Penalty \(%\)</t>
+    <t id="117">Dock idle S-sized ships</t>
+    <t id="118">Dock idle M-sized ships</t>
+    <t id="119">Dock idle L-sized ships</t>
+    <t id="120">Ware to mine</t>
+    <t id="121">Home Station</t>
+
+    <!-- options menu: global settings -->
+    <t id="200">WarehouseFleets</t>
+    <t id="201">Global Settings</t>
+    <t id="202">Player Account Threshold \(M\)</t>
+    <t id="203">WarehouseFleet ships will only buy from NPC stations if the player account will remain above this threshold \(value in millions\)</t>
+    <t id="204">Auto-transfer money</t>
+    <t id="205">Enable auto-transfer of excess credits from warehouse accounts to player account</t>
+    <t id="206">Cargo emptying routine</t>
+    <t id="207">Trade orders may fail and leave cargo unhandled in the ships. Select the method of cargo auto-handling below:\n\nRefund: Wares are refunded back to the player based on their average prices. Shows up as a transfer on the transaction log\n\nTeleport: wares are teleported to the warehouse\n\nDestroy: wares are destroyed\n\nReturn: wares are returned to the warehouse through trade orders\n\nDrop: wares are dropped</t>
+    <t id="208">Refund \(Default\)</t>
+    <t id="209">Teleport</t>
+    <t id="210">Destroy</t>
+    <t id="211">Return</t>
+    <t id="212">Drop</t>
+    <t id="213">Organize fleets in menu as</t>
+    <t id="214">Independent fleets: WarehouseFleet ships will be displayed on the top level of the map/property menus.\n\nSubordinates of warehouse: fleets will be displayed as subordinates under their respective warehouses.\n\nSwitching this setting immediately attaches/detaches all existing fleets.</t>
+    <t id="215">Independent fleets \(Default\)</t>
+    <t id="216">Subordinates of warehouse</t>
+
+    <!-- options menu: default fleet settings -->
+    <t id="220">Default Fleet Settings \(applied when creating new WarehouseFleets\)</t>
+    <t id="221">Apply to all fleets now</t>
+    <t id="222">Applies this setting to all existing WarehouseFleets.</t>
+
+    <!-- options menu: mouse-over texts of the default fleet settings -->
+    <t id="231">Avoids scheduling inefficient trips. No ship will be scheduled that uses less than the specified cargo space. Setting this value too low can cause performance degradation. Setting the value too high might prevent/delay balancing of low volume wares. Ships supplying build storages or restocking drone/ammo resources may ignore this setting if they fully satisfy the request. Smaller transports may still be added to a trip to the same station that meets the threshold.</t>
+    <t id="232">Penalty per gate jump for NPC trades and surplus sales, to keep travel distances short</t>
+    <t id="233">Reduces the attractivity of mining operations in other sectors to keep travel distances short</t>
+    <t id="234">Even out wares between your warehouses by fill level. 0 = off.</t>
+    <t id="235">Deliver resources to, collect products from and restock drones/ammo for your non-warehouse stations. 0 = off.</t>
+    <t id="236">Buy from / sell to NPC stations at 5% margin or more. Respects the trade rules of the warehouse offers. 0 = off.</t>
+    <t id="237">Sell stock of the home warehouse above the keep level \(see Sell Surplus: Keep\) to NPC stations, never below your own sell price. Ignores trade rules. 0 = off.</t>
+    <t id="238">Share of the storage target of each ware that is never sold as surplus. Everything above it may be sold to NPC stations in the fleet targets, even if the ware trade rule forbids NPC trade \(e.g. player-only\). Never sells below the warehouse sell price. 100% disables sell-out.</t>
+    <t id="239">Fill the stations in Supply Targets \(e.g. shipyards\). 0 = off.</t>
+    <t id="240">Deliver to your build storages. 0 = off.</t>
+    <t id="241">Mining trips for mining-capable ships. 0 = off.</t>
+    <t id="242">S-sized ships should dock at their home warehouse while waiting for new delivery jobs</t>
+    <t id="243">M-sized ships should dock at their home warehouse while waiting for new delivery jobs</t>
+    <t id="244">L-sized ships should dock at their home warehouse while waiting for new delivery jobs</t>
+  </page>
+</language>

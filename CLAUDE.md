@@ -10,7 +10,7 @@ An X4: Foundations mod ("Warehouse Fleets", extension id `WarehouseFleets`) writ
 
 ## Develop / verify
 
-- Syntax check after edits: `xmllint --noout md/warehousefleets.xml` (and any other touched XML).
+- Check after edits: the `x4` MCP server (X4CodeSense) — `check` on the repo validates md/aiscripts/patches against the game schemas, expressions and text references; `describe_element`, `expression_type`, `find`, `text` replace grepping the game's xsd/scriptproperties/t files. It does not notice edits to `t/*.xml` (it reads the repo through the `extensions/` symlink): after changing texts, reconnect it via `/mcp` before trusting `text-undefined` warnings. Without it, at least `xmllint --noout` every touched XML.
 - Deploy for testing: the repo must be inside `<X4 install>/extensions/`. On this machine `~/.local/share/Steam/steamapps/common/X4 Foundations/extensions/x4_warehouse_fleets` is a **symlink to this repo**, so the game always runs the current working tree (including uncommitted changes) — restart the game / load a save after edits. MD changes to cue versions/patches apply on load.
 - Savegame inspection: `zcat` a save into the scratchpad and grep it. Ship orders appear as `<order order="WarehouseFleet|Assist|TradePerform|...">` with `<trade buyer=… seller=… partner=<ship> ware=…>`; list-typed order params (e.g. `targets`) are stored as numeric ids resolved via `<ref id="…">` blocks near the end of the file. Cargo `<ware ware="x"/>` without `amount` means 1; buy offers always store `amount="0"`, the real demand is `desired`.
 - Runtime debugging: the scheduler writes `debug_to_file` logs into a `WarehouseFleets` directory (one file per ship idcode, plus `scheduler`, `config`, `garbage-collector`); these only appear when the game is started with script log files enabled. Each candidate transport is logged with its type, importance, rating, amounts and cargo usage — the first place to look when a ware "isn't transported".
@@ -34,6 +34,7 @@ An X4: Foundations mod ("Warehouse Fleets", extension id `WarehouseFleets`) writ
 ## Conventions / gotchas
 
 - Many comments are in German; keep the existing style when editing nearby code.
+- User-visible texts live in `t/0001.xml` (page `1779100`; English, used as fallback for all languages; translations go in `t/0001-lNNN.xml`). Reference them as `{1779100, id}` — never put plain text in `<order name/description>` or `<param text>` (those are expressions; multi-word literals are syntax errors). In MD the reference is an expression too (`$text = {1779100, 201}`). In t files unescaped `(...)` is a comment and gets stripped: write literal parentheses as `\(` `\)`. `\n` stays as written. Order and menu labels share ids 101–121; menu-only texts are 200+.
 - Aiscript params that change need a `<patch sinceversion>` and a bumped aiscript `version` so existing saves migrate.
 - Remove list elements by index in reverse loops (`remove_value name="$list.{$idx}"`); `remove_from_list` by value proved unreliable.
 - Table keys are built as `'$' + ...` strings.

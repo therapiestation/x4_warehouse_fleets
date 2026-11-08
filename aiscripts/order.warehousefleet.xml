@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <aiscript name="WarehouseFleet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/manuel/Repos/x4-game-files/aiscripts/aiscripts.xsd" version="48">
 
-  <order id="WarehouseFleet" name="WarehouseFleet" description="Warehouse Fleet" category="trade" infinite="true">
+  <order id="WarehouseFleet" name="{1779100, 1}" description="{1779100, 2}" category="trade" infinite="true">
     <params>
 
       <!-- home warehouse -->
-      <param name="sourceStation" required="true" type="object" text="Home Warehouse">
+      <param name="sourceStation" required="true" type="object" text="{1779100, 101}">
         <input_param name="class" value="[class.station]" />
         <input_param name="owner" value="this.ship.trueowner" />
       </param>
 
       <!-- targets -->
-      <param name="targets" type="list" default="[]" text="Targets (all ships)">
+      <param name="targets" type="list" default="[]" text="{1779100, 102}">
         <input_param name="type" value="'object'" />
       </param>
-      <param name="targetsL" type="list" default="[]" text="Targets (L only)">
+      <param name="targetsL" type="list" default="[]" text="{1779100, 103}">
         <input_param name="type" value="'object'" />
       </param>
-      <param name="targetsM" type="list" default="[]" text="Targets (M only)">
+      <param name="targetsM" type="list" default="[]" text="{1779100, 104}">
         <input_param name="type" value="'object'" />
       </param>
-      <param name="supplyTargets" type="list" default="[]" text="Supply Targets">
+      <param name="supplyTargets" type="list" default="[]" text="{1779100, 105}">
         <input_param name="type" value="'object'" />
         <patch sinceversion="38" value="[]" />
       </param>
 
       <!-- priorities and behavior -->
-      <param name="prioDistribution" default="global.$WarehouseFleets.$prioDistribution" type="number" text="Prio: Balance Warehouses">
+      <param name="prioDistribution" default="global.$WarehouseFleets.$prioDistribution" type="number" text="{1779100, 106}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
       </param>
-      <param name="prioStations" default="global.$WarehouseFleets.$prioStations" type="number" text="Prio: Own Factories">
+      <param name="prioStations" default="global.$WarehouseFleets.$prioStations" type="number" text="{1779100, 107}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="47" value="global.$WarehouseFleets.$prioStations" />
       </param>
-      <param name="prioTrade" default="global.$WarehouseFleets.$prioTrade" type="number" text="Prio: NPC Trade (Profit)">
+      <param name="prioTrade" default="global.$WarehouseFleets.$prioTrade" type="number" text="{1779100, 108}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
       </param>
-      <param name="prioSellOut" default="global.$WarehouseFleets.$prioSellOut" type="number" text="Prio: NPC Sell Surplus">
+      <param name="prioSellOut" default="global.$WarehouseFleets.$prioSellOut" type="number" text="{1779100, 109}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="48" value="global.$WarehouseFleets.$prioSellOut" />
       </param>
-      <param name="prioSupply" default="global.$WarehouseFleets.$prioSupply" type="number" text="Prio: Supply Targets">
+      <param name="prioSupply" default="global.$WarehouseFleets.$prioSupply" type="number" text="{1779100, 110}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="38" value="5" />
       </param>
-      <param name="prioBuild" default="global.$WarehouseFleets.$prioBuild" type="number" text="Prio: Build Storages">
+      <param name="prioBuild" default="global.$WarehouseFleets.$prioBuild" type="number" text="{1779100, 111}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="42" value="7" />
       </param>
-      <param name="prioMining" default="global.$WarehouseFleets.$prioMining" type="number" text="Prio: Mining">
+      <param name="prioMining" default="global.$WarehouseFleets.$prioMining" type="number" text="{1779100, 112}">
         <input_param name="min" value="0" />
         <input_param name="max" value="10" />
         <patch sinceversion="46" value="global.$WarehouseFleets.$prioMining" />
       </param>
 
-      <param name="minCargoUsage" default="global.$WarehouseFleets.$minCargoUsage" type="number" text="Min. Load (% of hold)">
+      <param name="minCargoUsage" default="global.$WarehouseFleets.$minCargoUsage" type="number" text="{1779100, 113}">
         <input_param name="min" value="0" />
         <input_param name="max" value="90" />
         <patch sinceversion="43" value="[$minCargoUsage, 90].min" comment="reduced max value from 100 to 90" />
       </param>
-      <param name="sellOutKeep" default="global.$WarehouseFleets.$sellOutKeep" type="number" text="Sell Surplus: Keep (%)">
+      <param name="sellOutKeep" default="global.$WarehouseFleets.$sellOutKeep" type="number" text="{1779100, 114}">
         <input_param name="min" value="0" />
         <input_param name="max" value="100" />
         <patch sinceversion="48" value="global.$WarehouseFleets.$sellOutKeep" />
       </param>
-      <param name="tradeGatePenalty" default="global.$WarehouseFleets.$tradeGatePenalty" type="number" text="NPC Trade: Gate Penalty (%)">
+      <param name="tradeGatePenalty" default="global.$WarehouseFleets.$tradeGatePenalty" type="number" text="{1779100, 115}">
         <input_param name="min" value="0" />
         <input_param name="max" value="90" />
       </param>
-      <param name="miningGatePenalty" default="global.$WarehouseFleets.$miningGatePenalty" type="number" text="Mining Gate Penalty (%)">
+      <param name="miningGatePenalty" default="global.$WarehouseFleets.$miningGatePenalty" type="number" text="{1779100, 116}">
         <input_param name="min" value="0" />
         <input_param name="max" value="90" />
         <patch sinceversion="46" value="global.$WarehouseFleets.$miningGatePenalty" />
       </param>
-      <param name="waitInDockS" type="bool" default="global.$WarehouseFleets.$waitInDockS" text="Dock idle S-sized ships">
+      <param name="waitInDockS" type="bool" default="global.$WarehouseFleets.$waitInDockS" text="{1779100, 117}">
         <patch sinceversion="43" value="global.$WarehouseFleets.$waitInDockS" />
       </param>
-      <param name="waitInDockM" type="bool" default="global.$WarehouseFleets.$waitInDockM" text="Dock idle M-sized ships">
+      <param name="waitInDockM" type="bool" default="global.$WarehouseFleets.$waitInDockM" text="{1779100, 118}">
         <patch sinceversion="43" value="global.$WarehouseFleets.$waitInDockM" />
       </param>
-      <param name="waitInDockL" type="bool" default="global.$WarehouseFleets.$waitInDockL" text="Dock idle L-sized ships">
+      <param name="waitInDockL" type="bool" default="global.$WarehouseFleets.$waitInDockL" text="{1779100, 119}">
         <patch sinceversion="43" value="global.$WarehouseFleets.$waitInDockL" />
       </param>
 

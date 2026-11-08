@@ -10,7 +10,7 @@
           param="table[
             $id = 'WarehouseFleetsConfigMenu',
             $columns = 2,
-            $title = 'WarehouseFleets',
+            $title = {1779100, 200},
             $onOpen = BuildWarehouseFleetConfigMenu,
           ]" />
         <cancel_cue cue="this" />
@@ -23,107 +23,100 @@
       <actions>
 
         <signal_cue_instantly cue="AddEmptyRow" />
-        <signal_cue_instantly cue="AddCenteredTextRow" param="table[$text='Global Settings']" />
+        <signal_cue_instantly cue="AddCenteredTextRow" param="table[$text={1779100, 201}]" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
         <signal_cue_instantly cue="AddSliderRow" param="table[
-          $id = 'accountThreshold', $min = 0, $max = 100, $suffix = 'M', $default = 1, $text = 'Player Account Threshold (M)', 
-          $mouseOverText = 'WarehouseFleet ships will only buy from NPC stations if the player account will remain above this threshold (value in millions)'
+          $id = 'accountThreshold', $min = 0, $max = 100, $suffix = 'M', $default = 1, $text = {1779100, 202}, 
+          $mouseOverText = {1779100, 203}
         ]" />
 
         <signal_cue_instantly cue="AddCheckboxRow" param="table[
-          $id = 'transferToPlayer', $default = false, $text = 'Auto-transfer money', 
-          $mouseOverText = 'Enable auto-transfer of excess credits from warehouse accounts to player account',
+          $id = 'transferToPlayer', $default = false, $text = {1779100, 204}, 
+          $mouseOverText = {1779100, 205},
         ]" />
 
         <signal_cue_instantly cue="AddDropdownRow" param="table[
           $id = 'failedOrderHandling',
           $options = [
-            table[$text='Refund (Default)', $value=1],
-            table[$text='Teleport', $value=2],
-            table[$text='Destroy',  $value=3],
-            table[$text='Return',   $value=4],
-            table[$text='Drop',     $value=5]
+            table[$text={1779100, 208}, $value=1],
+            table[$text={1779100, 209}, $value=2],
+            table[$text={1779100, 210},  $value=3],
+            table[$text={1779100, 211},   $value=4],
+            table[$text={1779100, 212},     $value=5]
           ],
-          $text = 'Cargo emptying routine',
-          $mouseOverText = 'Trade orders may fail and leave cargo unhandled in the ships. Select the method of cargo auto-handling below:\n\n' + 
-            'Refund: Wares are refunded back to the player based on their average prices. Shows up as a transfer on the transaction log\n\n' +
-            'Teleport: wares are teleported to the warehouse\n\n'+ 
-            'Destroy: wares are destroyed\n\n'+
-            'Return: wares are returned to the warehouse through trade orders\n\n'+
-            'Drop: wares are dropped',
+          $text = {1779100, 206},
+          $mouseOverText = {1779100, 207},
         ]" />
 
         <signal_cue_instantly cue="AddDropdownRow" param="table[
           $id = 'fleetOrganization',
           $options = [
-            table[$text='Independent fleets (Default)', $value=1],
-            table[$text='Subordinates of warehouse', $value=2]
+            table[$text={1779100, 215}, $value=1],
+            table[$text={1779100, 216}, $value=2]
           ],
-          $text = 'Organize fleets in menu as',
-          $mouseOverText = 'Independent fleets: WarehouseFleet ships will be displayed on the top level of the map/property menus.\n\n' +
-            'Subordinates of warehouse: fleets will be displayed as subordinates under their respective warehouses.\n\n' +
-            'Switching this setting immediately attaches/detaches all existing fleets.',
+          $text = {1779100, 213},
+          $mouseOverText = {1779100, 214},
         ]" />
 
         <signal_cue_instantly cue="AddEmptyRow" />
         <signal_cue_instantly cue="AddEmptyRow" />
-        <signal_cue_instantly cue="AddCenteredTextRow" param="table[$text='Default Fleet Settings (applied when creating new WarehouseFleets)']" />
+        <signal_cue_instantly cue="AddCenteredTextRow" param="table[$text={1779100, 220}]" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'minCargoUsage', $min = 0, $max = 90, $suffix = '%', $default = 50, $text = 'Min. Load (% of hold)', $mouseOverText = 'Avoids scheduling inefficient trips. No ship will be scheduled that uses less than the specified cargo space. Setting this value too low can cause performance degradation. Setting the value too high might prevent/delay balancing of low volume wares. Ships supplying build storages or restocking drone/ammo resources may ignore this setting if they fully satisfy the request. Smaller transports may still be added to a trip to the same station that meets the threshold.' ]" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'minCargoUsage', $min = 0, $max = 90, $suffix = '%', $default = 50, $text = {1779100, 113}, $mouseOverText = {1779100, 231} ]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'minCargoUsage']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'tradeGatePenalty', $min = 0, $max = 90, $suffix = '%', $default = 20, $text = 'NPC Trade: Gate Penalty (%)', $mouseOverText = 'Penalty per gate jump for NPC trades and surplus sales, to keep travel distances short' ]" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'tradeGatePenalty', $min = 0, $max = 90, $suffix = '%', $default = 20, $text = {1779100, 115}, $mouseOverText = {1779100, 232} ]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'tradeGatePenalty']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'miningGatePenalty', $min = 0, $max = 90, $suffix = '%', $default = 20, $text = 'Mining Gate Penalty (%)', $mouseOverText = 'Reduces the attractivity of mining operations in other sectors to keep travel distances short' ]" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[ $id = 'miningGatePenalty', $min = 0, $max = 90, $suffix = '%', $default = 20, $text = {1779100, 116}, $mouseOverText = {1779100, 233} ]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'miningGatePenalty']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioDistribution', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Balance Warehouses', $mouseOverText = 'Even out wares between your warehouses by fill level. 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioDistribution', $min = 0, $max = 10, $suffix = '', $default = 5, $text = {1779100, 106}, $mouseOverText = {1779100, 234}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioDistribution']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioStations', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Own Factories', $mouseOverText = 'Deliver resources to, collect products from and restock drones/ammo for your non-warehouse stations. 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioStations', $min = 0, $max = 10, $suffix = '', $default = 5, $text = {1779100, 107}, $mouseOverText = {1779100, 235}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioStations']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioTrade', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: NPC Trade (Profit)', $mouseOverText = 'Buy from / sell to NPC stations at 5% margin or more. Respects the trade rules of the warehouse offers. 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioTrade', $min = 0, $max = 10, $suffix = '', $default = 5, $text = {1779100, 108}, $mouseOverText = {1779100, 236}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioTrade']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioSellOut', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: NPC Sell Surplus', $mouseOverText = 'Sell stock of the home warehouse above the keep level (see Sell Surplus: Keep) to NPC stations, never below your own sell price. Ignores trade rules. 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioSellOut', $min = 0, $max = 10, $suffix = '', $default = 5, $text = {1779100, 109}, $mouseOverText = {1779100, 237}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioSellOut']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'sellOutKeep', $min = 0, $max = 100, $suffix = '%', $default = 100, $text = 'Sell Surplus: Keep (%)', $mouseOverText = 'Share of the storage target of each ware that is never sold as surplus. Everything above it may be sold to NPC stations in the fleet targets, even if the ware trade rule forbids NPC trade (e.g. player-only). Never sells below the warehouse sell price. 100% disables sell-out.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'sellOutKeep', $min = 0, $max = 100, $suffix = '%', $default = 100, $text = {1779100, 114}, $mouseOverText = {1779100, 238}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'sellOutKeep']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioSupply', $min = 0, $max = 10, $suffix = '', $default = 5, $text = 'Prio: Supply Targets', $mouseOverText = 'Fill the stations in Supply Targets (e.g. shipyards). 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioSupply', $min = 0, $max = 10, $suffix = '', $default = 5, $text = {1779100, 110}, $mouseOverText = {1779100, 239}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioSupply']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioBuild', $min = 0, $max = 10, $suffix = '', $default = 7, $text = 'Prio: Build Storages', $mouseOverText = 'Deliver to your build storages. 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioBuild', $min = 0, $max = 10, $suffix = '', $default = 7, $text = {1779100, 111}, $mouseOverText = {1779100, 240}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioBuild']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioMining', $min = 0, $max = 10, $suffix = '', $default = 4, $text = 'Prio: Mining', $mouseOverText = 'Mining trips for mining-capable ships. 0 = off.']" />
+        <signal_cue_instantly cue="AddSliderRow" param="table[$id = 'prioMining', $min = 0, $max = 10, $suffix = '', $default = 4, $text = {1779100, 112}, $mouseOverText = {1779100, 241}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'prioMining']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddCheckboxRow" param="table[$id = 'waitInDockS', $default = true, $text = 'Dock idle S-sized ships', $mouseOverText = 'S-sized ships should dock at their home warehouse while waiting for new delivery jobs']" />
+        <signal_cue_instantly cue="AddCheckboxRow" param="table[$id = 'waitInDockS', $default = true, $text = {1779100, 117}, $mouseOverText = {1779100, 242}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'waitInDockS']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddCheckboxRow" param="table[$id = 'waitInDockM', $default = true, $text = 'Dock idle M-sized ships', $mouseOverText = 'M-sized ships should dock at their home warehouse while waiting for new delivery jobs']" />
+        <signal_cue_instantly cue="AddCheckboxRow" param="table[$id = 'waitInDockM', $default = true, $text = {1779100, 118}, $mouseOverText = {1779100, 243}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'waitInDockM']" />
         <signal_cue_instantly cue="AddEmptyRow" />
 
-        <signal_cue_instantly cue="AddCheckboxRow" param="table[$id = 'waitInDockL', $default = false, $text = 'Dock idle L-sized ships', $mouseOverText = 'L-sized ships should dock at their home warehouse while waiting for new delivery jobs']" />
+        <signal_cue_instantly cue="AddCheckboxRow" param="table[$id = 'waitInDockL', $default = false, $text = {1779100, 119}, $mouseOverText = {1779100, 244}]" />
         <signal_cue_instantly cue="AddSyncButtonRow" param="table[$id = 'waitInDockL']" />
         <signal_cue_instantly cue="AddEmptyRow" />
       </actions>
@@ -217,8 +210,8 @@
           param="table[
             $col = 2,
             $id = event.param.$id,
-            $text = table[$text='Apply to all fleets now'],
-            $mouseOverText = 'Applies this setting to all existing WarehouseFleets.',
+            $text = table[$text={1779100, 221}],
+            $mouseOverText = {1779100, 222},
             $onClick = OnSyncButtonPressed
           ]"
         />
