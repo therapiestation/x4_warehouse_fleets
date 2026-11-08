@@ -1073,10 +1073,17 @@
               <!-- Transports that fully satisfy a build or restock request may ignore minCargoUsage, otherwise small/low-volume requests would never be served -->
               <set_value name="$completesBuildRequest" exact="$transportType == 'build' and $receiverOffer.desiredamount == $amount" />
               <set_value name="$completesRestockRequest" exact="$transportType == 'restock' and $amount gt 0 and $amount == $receiverDemand" />
-              <set_value name="$completesRequest" exact="$completesBuildRequest or $completesRestockRequest" />
+              <!-- Consumers whose whole storage target for the ware is smaller than minCargoUsage (e.g. a silicon carbide factory keeps only ~100
+                   metallic microlattice = 100 m³) can never be served by a viable trip and starved unless another ware happened to need a full load.
+                   Fill them up completely once they are at most half full, so deliveries stay batched instead of trickling.
+                   Only S/M ships do these small runs (S: home sector, M: also other sectors, e.g. expansion outposts), L ships are kept for real loads. -->
+              <set_value name="$completesConsumerRequest" exact="($ship.isclass.ship_s or $ship.isclass.ship_m) and $transportType == 'consumer' and $amount gt 0 and $amount == $receiverDemand
+                and $receiverCargoRatio le 50.0
+                and ($receiverCapacity * $providerOffer.ware.volume) lt ($order.$minCargoUsage / 100.0 * $shipCapacity)" />
+              <set_value name="$completesRequest" exact="$completesBuildRequest or $completesRestockRequest or $completesConsumerRequest" />
               <set_value name="$rating" exact="$importance *
                 if $completesBuildRequest then ($shipCapacity)
-                else if $completesRestockRequest then [$amount * $providerOffer.ware.volume, $order.$minCargoUsage / 100.0 * $shipCapacity].max
+                else if $completesRestockRequest or $completesConsumerRequest then [$amount * $providerOffer.ware.volume, $order.$minCargoUsage / 100.0 * $shipCapacity].max
                 else ($amount * $providerOffer.ware.volume)" comment="restock: rate like a trip that just meets minCargoUsage, so it isn't starved in busy fleets" />
 
               <debug_to_file chance="100" name="$ship.idcode" directory="'WarehouseFleets'"
